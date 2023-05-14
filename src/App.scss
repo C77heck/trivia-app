@@ -4,12 +4,8 @@
 @import "styles/functions";
 @import "styles/animations";
 @import "features/shared-ui/buttons/button";
-@import "features/shared-ui/inputs/input";
-@import "features/shared-ui/modal/modal";
 
 @include Helpers($lg, $xl, $md, $sm, $colours);
 @include Fonts();
 @include Animations();
 @include Button($colours);
-@include Input($colours);
-@include Modal($md);

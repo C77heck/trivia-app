@@ -8,8 +8,8 @@ export const Constants = {
             link: '/questionnaire',
             title: ''
         },
-        scoreBoard: {
-            link: '/score-board',
+        scoreboard: {
+            link: '/scoreboard',
             title: ''
         },
     }

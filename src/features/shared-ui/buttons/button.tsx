@@ -1,10 +1,9 @@
-import { ButtonContent } from './button-content';
 import './button.scss';
 
 export interface ButtonProps {
     type?: 'button' | 'submit' | 'reset' | undefined;
     className?: string;
-    buttonStyle?: 'submit' | 'link' | 'action' | 'outline' | 'full' | 'disabled';
+    buttonStyle?: 'false' | 'true' | 'link';
     name?: string;
     id?: string;
     disabled?: boolean;
@@ -24,27 +23,18 @@ export const Button = (props: ButtonProps) => {
         disabled={props.disabled}
         onClick={props.onClick}
     >
-        <ButtonContent
-            isLoading={!!props.isLoading}
-            content={props.children ? props.children : <span className={'color--light fs-17'}>{props.title}</span>}
-        />
+        {props.children ? props.children : <span className={'color--light fs-17'}>{props.title}</span>}
     </button>;
 };
 
 const getButtonType = (type: string) => {
     switch (type) {
-        case 'submit':
-            return 'button button--submit';
+        case 'true':
+            return 'button button--true';
+        case 'false':
+            return 'button button--false';
         case 'link':
             return 'button button--link';
-        case 'action':
-            return 'button button--action';
-        case 'outline':
-            return 'button button--outline';
-        case 'full':
-            return 'button button--full';
-        case 'disabled':
-            return 'button button--disabled';
         default:
             return 'button';
     }

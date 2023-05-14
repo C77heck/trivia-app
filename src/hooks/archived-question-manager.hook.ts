@@ -1,4 +1,5 @@
 import { Storage } from '../libs/storage';
+import { AnsweredQuestion } from './game-manager.hook';
 
 export type AnswerOption = 'True' | 'False';
 
@@ -26,7 +27,7 @@ export const useArchivedQuestionManager = () => {
         return !questions?.length ? [] : questions;
     };
 
-    const archiveQuestions = (questions: Question[]): void => {
+    const archiveQuestions = (questions: AnsweredQuestion[]): void => {
         const oldQuestions = questions?.map((question) => question?.question || '');
         const savedQuestions = getArchivedQuestions();
 

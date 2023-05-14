@@ -10,6 +10,7 @@ export interface ScreenRouteProps extends ScreenProps {
 }
 
 export const ScreenRoute = (props: ScreenRouteProps) => {
+    console.log(props);
     return <Routes>
         <Route
             path={props.route}

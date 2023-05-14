@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 import { HttpError } from '../libs/http-error';
-import { sleep } from '../libs/sleep';
 import { Storage } from '../libs/storage';
 import { ApiResponse, Question, useArchivedQuestionManager } from './archived-question-manager.hook';
+import { AnsweredQuestion } from './game-manager.hook';
 
-export const useQuestionManager = (): { questions: Question[]; isLoading: boolean; } => {
+export interface QuestionManagerHookProps {
+    questions: Question[];
+    isLoading: boolean;
+    saveQuestionnaire: (answeredQuestion: (AnsweredQuestion | Question)[]) => void;
+    getCompletedQuestionnaire: () => AnsweredQuestion[];
+    clearQuestionnaire: () => void;
+}
+
+export const useQuestionManager = (): QuestionManagerHookProps => {
     const endpoint = import.meta.env.VITE_API_ENDPOINT;
     const [questions, setQuestions] = useState<Question[]>([]);
-    const storage = new Storage<Question[]>('current-questionnaire');
+    const storage = new Storage<(AnsweredQuestion | Question)[]>('current-questionnaire');
     const { getArchivedQuestions } = useArchivedQuestionManager();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -15,11 +23,10 @@ export const useQuestionManager = (): { questions: Question[]; isLoading: boolea
         (async () => {
             try {
                 setIsLoading(true);
-                await sleep(800);
                 const savedQuestions = storage.get();
 
                 if (!savedQuestions?.length) {
-                    await setupQuestionnaire();
+                    return setupQuestionnaire();
                 }
 
                 setQuestions(savedQuestions);
@@ -31,23 +38,28 @@ export const useQuestionManager = (): { questions: Question[]; isLoading: boolea
         })();
     }, []);
 
-    const checkForDuplicates = (newQuestions: Question[]): { numberOfDuplicates: number; questionsToSave: Question[] } => {
+    const checkForDuplicates = (newQuestions: Question[]): { hasDuplicates: boolean; questionsToSave: Question[] } => {
         const pastQuestions = getArchivedQuestions();
-
-        let numberOfDuplicates = 0;
         const questionsToSave = [];
+        const questions: string[] = [];
 
         for (const question of newQuestions) {
             const existingQuestion = pastQuestions.find(pastQuestion => pastQuestion === question.question);
             if (existingQuestion) {
-                numberOfDuplicates++;
                 continue;
             }
 
-            questionsToSave.push(question);
+            if (!questions.includes(question.question)) {
+                questionsToSave.push(question);
+                questions.push(question.question);
+            }
+
+            if (questionsToSave.length === 10) {
+                return { questionsToSave, hasDuplicates: false };
+            }
         }
 
-        return { numberOfDuplicates, questionsToSave };
+        return { questionsToSave, hasDuplicates: true };
     };
 
     const setupQuestionnaire = async () => {
@@ -66,9 +78,9 @@ export const useQuestionManager = (): { questions: Question[]; isLoading: boolea
         }
     };
 
-    const getQuestions = async (questions = [], amount = 10) => {
+    const getQuestions = async (questions = [], tries = 0, difficulty: 'easy' | 'hard' = 'hard') => {
         try {
-            const response = await fetch(`${endpoint}?amount=${amount}&difficulty=hard&type=boolean`);
+            const response = await fetch(`${endpoint}?amount=50&difficulty=${difficulty}&type=boolean`);
 
             if (!response.ok) {
                 throw new HttpError('Something went wrong');
@@ -80,17 +92,40 @@ export const useQuestionManager = (): { questions: Question[]; isLoading: boolea
                 throw new HttpError('Something went wrong');
             }
 
-            const { numberOfDuplicates, questionsToSave } = checkForDuplicates([...questions, ...responseData.results]);
+            const { hasDuplicates, questionsToSave } = checkForDuplicates([...questions, ...responseData.results]);
 
-            if (!numberOfDuplicates) {
+            if (!hasDuplicates) {
                 return questionsToSave;
             }
 
-            return getQuestions(questionsToSave, numberOfDuplicates);
+            switch (difficulty) {
+                case 'hard':
+                    return tries > 3
+                        ? getQuestions(questionsToSave, 0, 'easy')
+                        : getQuestions(questionsToSave, tries + 1, difficulty);
+                case 'easy':
+                    return tries > 13
+                        ? questionsToSave
+                        : getQuestions(questionsToSave, tries + 1, difficulty);
+                default:
+                    return questionsToSave;
+            }
         } catch (e) {
             throw e;
         }
     };
 
-    return { questions, isLoading };
+    const clearQuestionnaire = (): void => {
+        storage.clear();
+    };
+
+    const saveQuestionnaire = (questionnaire: (AnsweredQuestion | Question)[]): void => {
+        storage.set(questionnaire);
+    };
+
+    const getCompletedQuestionnaire = (): AnsweredQuestion[] => {
+        return storage.get() as AnsweredQuestion[];
+    };
+
+    return { questions, isLoading, saveQuestionnaire, getCompletedQuestionnaire, clearQuestionnaire };
 };
