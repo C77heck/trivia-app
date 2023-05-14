@@ -1,35 +1,49 @@
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { ApiResponse, Question, useArchivedQuestionManager } from '../hooks/archived-question-manager.hook';
 import { HttpError } from '../libs/http-error';
 import { Storage } from '../libs/storage';
-import { ApiResponse, Question, useArchivedQuestionManager } from './archived-question-manager.hook';
-import { AnsweredQuestion } from './game-manager.hook';
+import { Children } from '../screens/libs/base-view';
 
-export interface QuestionManagerHookProps {
-    questions: Question[];
+export interface IQuestionnaireContext {
     isLoading: boolean;
-    saveQuestionnaire: (answeredQuestion: (AnsweredQuestion | Question)[]) => void;
-    getCompletedQuestionnaire: () => AnsweredQuestion[];
+    questionnaire: Question[];
+    currentQuestion: null | Question;
+    nextQuestion: () => void;
     clearQuestionnaire: () => void;
+    saveQuestionnaire: (questionnaire: Question[]) => void;
+    getQuestionnaire: () => Question[];
 }
 
-export const useQuestionManager = (): QuestionManagerHookProps => {
-    const endpoint = import.meta.env.VITE_API_ENDPOINT;
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const storage = new Storage<(AnsweredQuestion | Question)[]>('current-questionnaire');
-    const { getArchivedQuestions } = useArchivedQuestionManager();
+const QuestionnaireContext = createContext<IQuestionnaireContext>({
+    isLoading: false,
+    questionnaire: [],
+    currentQuestion: null,
+    nextQuestion: () => {
+    },
+    clearQuestionnaire: () => {
+    },
+    saveQuestionnaire: (questionnaire: Question[]) => {
+    },
+    getQuestionnaire: (): Question[] => {
+        return [];
+    },
+});
+
+export const WithQuestionnaireContext = ({ children }: { children: Children }) => {
+    const [questionnaire, setQuestionnaire] = useState([]);
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const endpoint = import.meta.env.VITE_API_ENDPOINT;
+    const storage = new Storage<Question[]>('current-questionnaire');
+    const { getArchivedQuestions } = useArchivedQuestionManager();
 
     useEffect(() => {
         (async () => {
             try {
                 setIsLoading(true);
                 const savedQuestions = storage.get();
-
-                if (!savedQuestions?.length) {
-                    return setupQuestionnaire();
-                }
-
-                setQuestions(savedQuestions);
+                const questions = !savedQuestions?.length ? await getNewQuestionnaire() : savedQuestions;
+                setQuestionnaire(questions);
             } catch (e) {
                 console.log(e);
             } finally {
@@ -62,17 +76,17 @@ export const useQuestionManager = (): QuestionManagerHookProps => {
         return { questionsToSave, hasDuplicates: true };
     };
 
-    const setupQuestionnaire = async () => {
+    const getNewQuestionnaire = async () => {
         try {
             const questions = await getQuestions();
+
             const indexedQuestions = questions.map((question, index) => {
                 question.key = index;
 
                 return question;
             });
 
-            setQuestions(indexedQuestions);
-            storage.set(indexedQuestions);
+            return indexedQuestions;
         } catch (e) {
             throw e;
         }
@@ -115,17 +129,36 @@ export const useQuestionManager = (): QuestionManagerHookProps => {
         }
     };
 
+    const nextQuestion = () => {
+        setCurrentQuestion(prev => {
+            const nextKey = (prev?.key || 0) + 1;
+
+            return questionnaire[nextKey];
+        });
+    };
+
     const clearQuestionnaire = (): void => {
         storage.clear();
     };
 
-    const saveQuestionnaire = (questionnaire: (AnsweredQuestion | Question)[]): void => {
+    const saveQuestionnaire = (questionnaire: Question[]): void => {
         storage.set(questionnaire);
     };
 
-    const getCompletedQuestionnaire = (): AnsweredQuestion[] => {
-        return storage.get() as AnsweredQuestion[];
+    const getQuestionnaire = (): Question[] => {
+        return storage.get();
     };
-
-    return { questions, isLoading, saveQuestionnaire, getCompletedQuestionnaire, clearQuestionnaire };
+    return <QuestionnaireContext.Provider value={{
+        isLoading,
+        questionnaire,
+        currentQuestion,
+        nextQuestion,
+        clearQuestionnaire,
+        saveQuestionnaire,
+        getQuestionnaire
+    }}>
+        {children}
+    </QuestionnaireContext.Provider>;
 };
+
+export const useQuestionnaireContext = () => useContext(QuestionnaireContext);

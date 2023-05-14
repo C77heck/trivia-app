@@ -9,7 +9,7 @@ import { Spinner } from '../shared-ui/spinner/spinner';
 import { QuestionIllustration } from './question-illustration';
 
 export const Questionnaire = () => {
-    const { currentQuestion, addAnsweredQuestion } = useGameManager();
+    const { currentQuestion, addAnsweredQuestion, setCurrentQuestion } = useGameManager();
     const { scoreboard } = Constants.routes;
     const navigate = useNavigate();
 
@@ -21,13 +21,14 @@ export const Questionnaire = () => {
 
     const { category, question, key } = currentQuestion;
     const questionNum = key + 1;
-    const handleOnAnswer = (userAnswer: AnswerOption) => {
+    const handleOnAnswer = async (userAnswer: AnswerOption) => {
         addAnsweredQuestion({
             ...currentQuestion,
             userAnswer
         });
 
         if (currentQuestion.key === 9) {
+            setCurrentQuestion(null);
             navigate(scoreboard.link);
         }
     };

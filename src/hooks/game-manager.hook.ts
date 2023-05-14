@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Question } from './archived-question-manager.hook';
-import { useQuestionManager } from './question-manager.hook';
-
-export interface AnsweredQuestion extends Question {
-    userAnswer: 'False' | 'True';
-}
+import { useQuestionnaireManager } from './questionnaire-manager.hook';
 
 export interface ScoreResponse {
     rightAnswers: string[];
@@ -13,19 +9,21 @@ export interface ScoreResponse {
 }
 
 export const useGameManager = () => {
-    const { questions, saveQuestionnaire, getCompletedQuestionnaire } = useQuestionManager();
-    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(questions?.[0] || null);
+    const { saveQuestionnaire, getQuestionnaire } = useQuestionnaireManager();
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>();
 
     useEffect(() => {
-        if (!questions?.length) {
+        const questionnaire = getQuestionnaire();
+
+        if (!questionnaire?.length || currentQuestion) {
             return;
         }
-        console.log(questions);
-        setCurrentQuestion(questions[0]);
-    }, [questions]);
 
-    const addAnsweredQuestion = (answeredQuestion: AnsweredQuestion) => {
-        const questionnaire = getCompletedQuestionnaire();
+        setCurrentQuestion(questionnaire[0]);
+    }, []);
+
+    const addAnsweredQuestion = (answeredQuestion: Question) => {
+        const questionnaire = getQuestionnaire();
         const updatedQuestionnaire = questionnaire.map(question => {
             if (question.question === answeredQuestion.question) {
                 return answeredQuestion;
@@ -34,14 +32,16 @@ export const useGameManager = () => {
             return question;
         });
 
-        setCurrentQuestion(updatedQuestionnaire[answeredQuestion.key + 1]);
+        const nextKey = answeredQuestion.key + 1;
+        setCurrentQuestion(updatedQuestionnaire[nextKey]);
         saveQuestionnaire(updatedQuestionnaire);
     };
 
     const getScore = (): ScoreResponse => {
         const rightAnswers = [];
         const wrongAnswers = [];
-        const completedQuestionnaire = getCompletedQuestionnaire();
+        const completedQuestionnaire = getQuestionnaire();
+
         for (const answeredQuestion of completedQuestionnaire) {
             if (!('userAnswer' in answeredQuestion)) {
                 throw new Error('Incomplete');
@@ -62,5 +62,5 @@ export const useGameManager = () => {
         };
     };
 
-    return { currentQuestion, addAnsweredQuestion, getScore };
+    return { currentQuestion, addAnsweredQuestion, getScore, setCurrentQuestion };
 };

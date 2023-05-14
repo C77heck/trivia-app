@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useArchivedQuestionManager } from '../../hooks/archived-question-manager.hook';
 import { useGameManager } from '../../hooks/game-manager.hook';
-import { useQuestionManager } from '../../hooks/question-manager.hook';
+import { useQuestionnaireManager } from '../../hooks/questionnaire-manager.hook';
 import { Constants } from '../../libs/constants';
 import { BaseView } from '../../screens/libs/base-view';
 import { AnswerResult } from './answer-result';
 
 export const Scoreboard = () => {
     const { getScore } = useGameManager();
-    const { getCompletedQuestionnaire, clearQuestionnaire } = useQuestionManager();
+    const { getQuestionnaire, clearQuestionnaire } = useQuestionnaireManager();
     const { archiveQuestions } = useArchivedQuestionManager();
     const { home, questionnaire } = Constants.routes;
     const navigate = useNavigate();
@@ -19,7 +19,6 @@ export const Scoreboard = () => {
         try {
             setResult(getScore() || null);
         } catch (e) {
-            console.log(e);
             if (e?.message === 'Incomplete') {
                 navigate(questionnaire.link);
             }
@@ -31,7 +30,7 @@ export const Scoreboard = () => {
     }
 
     const handleOnClick = () => {
-        const questionnaireToArchive = getCompletedQuestionnaire();
+        const questionnaireToArchive = getQuestionnaire();
         archiveQuestions(questionnaireToArchive);
         clearQuestionnaire();
         navigate(home.link);
