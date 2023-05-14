@@ -1,0 +1,279 @@
+@mixin Helpers($lg, $xl, $md, $sm, $colours) {
+    .screen-view {
+        background-image: url("/src/assets/images/texture.jpg");
+        min-height: 100vh;
+        max-width: 100vw;
+        min-width: 100vw;
+    }
+
+    .base-layout {
+        height: 60rem;
+        max-height: 96vh;
+        max-width: 100%;
+        width: 40rem;
+        border-radius: 16px;
+        padding: 1rem;
+        background-color: map-get-deep($colours, 'light', 1);
+    }
+
+    .text-decoration-none {
+        text-decoration: none;
+    }
+
+    .display-flex {
+        display: flex;
+    }
+
+    .overflow-hidden {
+        overflow: hidden;
+    }
+
+    .flex-column {
+        flex-direction: column;
+    }
+
+    .flex-row {
+        flex-direction: row;
+    }
+
+    .justify-content-center {
+        justify-content: center;
+    }
+
+    .justify-content-right {
+        justify-content: right;
+    }
+
+    .justify-content-start {
+        justify-content: flex-start;
+    }
+
+    .justify-content-end {
+        justify-content: flex-end;
+    }
+    .justify-content-space-around {
+        justify-content: space-around;
+    }
+
+    .justify-content-space-between {
+        justify-content: space-between;
+    }
+
+    .justify-content-space-evenly {
+        justify-content: space-evenly;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+
+    .align-items-end {
+        align-items: flex-end;
+    }
+
+    .align-items-start {
+        align-items: flex-start;
+    }
+
+    .text-align-center {
+        text-align: center;
+    }
+
+    .text-align-left {
+        text-align: left;
+    }
+
+    .text-align-justify {
+        text-align: justify;
+    }
+
+    .uppercase {
+        text-transform: uppercase;
+    }
+
+    .list-style-none {
+        list-style: none;
+    }
+
+    .round {
+        border-radius: 50%;
+    }
+
+    .border-box {
+        box-sizing: border-box;
+    }
+
+    .box-shadow {
+        box-shadow: 2px 3px 9px 0px map-get-deep($colours, 'dark', 4);
+    }
+
+    .transition {
+        transition: all 400ms;
+    }
+
+    .width-auto {
+        width: auto;
+    }
+    .width-fit-content {
+        width: fit-content;
+    }
+
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hr {
+        &--light {
+            border-top: 1px solid rgb(167, 165, 165);
+        }
+
+        &--dark {
+            border-top: 1px solid rgb(110, 108, 108);
+        }
+    }
+
+    .hover-opacity {
+        opacity: 1;
+        transition: all 190ms ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    .hover-scale {
+        transform: translateY(0);
+        transition: all 190ms ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px 0 map-get-deep($colours, 'dark', 3);
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+    }
+
+    .hover-lift {
+        box-shadow: 0 4px 8px 0 map-get-deep($colours, 'dark', 3);
+        transition: all 250ms;
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: 0 9px 11px 0 map-get-deep($colours, 'dark', 3);
+            transform: scale(1.02);
+        }
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .flex-wrap {
+        flex-wrap: wrap;
+    }
+
+    .flex-nowrap {
+        flex-wrap: nowrap;
+    }
+
+    .row {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .h-100 {
+        height: 100%;
+    }
+
+    @for $i from 0 through 40 {
+        .#{fs- + $i} {
+            font-size: $i + px;
+        }
+    }
+
+    @for $i from 1 through 24 {
+        .#{max-width- + $i} {
+            max-width: $i * 4.16 * 1%;
+        }
+        .#{col- + $i} {
+            flex: 0 0 $i * 4.16 * 1%;
+        }
+        .#{m- + $i} {
+            margin: $i * 4 + px;
+        }
+        .#{mt- + $i} {
+            margin-top: $i * 4 + px;
+        }
+        .#{mb- + $i} {
+            margin-bottom: $i * 4 + px;
+        }
+        .#{mr- + $i} {
+            margin-right: $i * 4 + px;
+        }
+        .#{ml- + $i} {
+            margin-left: $i * 4 + px;
+        }
+        .#{mx- + $i} {
+            margin-left: $i * 4 + px;
+            margin-right: $i * 4 + px;
+        }
+        .#{my- + $i} {
+            margin-top: $i * 4 + px;
+            margin-bottom: $i * 4 + px;
+        }
+        .#{p- + $i} {
+            padding: $i * 4 + px;
+        }
+        .#{pt- + $i} {
+            padding-top: $i * 4 + px;
+        }
+        .#{pb- + $i} {
+            padding-bottom: $i * 4 + px;
+        }
+        .#{pr- + $i} {
+            padding-right: $i * 4 + px;
+        }
+        .#{pl- + $i} {
+            padding-left: $i * 4 + px;
+        }
+        .#{px- + $i} {
+            padding-left: $i * 4 + px;
+            padding-right: $i * 4 + px;
+        }
+        .#{py- + $i} {
+            padding-top: $i * 4 + px;
+            padding-bottom: $i * 4 + px;
+        }
+    }
+
+    @each $l1-key, $l1-value in $colours {
+        .bgc-#{$l1-key} {
+            @each $l2-key, $l2-value in $l1-value {
+                &-#{$l2-key} {
+                    background-color: $l2-value;
+                }
+            }
+        }
+        .color-#{$l1-key} {
+            @each $l2-key, $l2-value in $l1-value {
+                &-#{$l2-key} {
+                    color: $l2-value;
+                }
+            }
+        }
+        .bc-#{$l1-key} {
+            @each $l2-key, $l2-value in $l1-value {
+                &-#{$l2-key} {
+                    border-color: $l2-value;
+                }
+            }
+        }
+    }
+}

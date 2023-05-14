@@ -1,0 +1,39 @@
+@mixin Fonts() {
+    @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap');
+
+    p, small, a, div, label, h1, h2, h3, h4, h5 {
+        font-family: 'Barlow', sans-serif;
+
+        color: map-get-deep($colours, 'dark', 2);
+    }
+
+
+    .fw {
+        &--400 {
+            font-weight: 400;
+        }
+
+        &--600 {
+            font-weight: 600;
+        }
+
+        &--700 {
+            font-weight: 700;
+        }
+
+        &--800 {
+            font-weight: 800;
+        }
+
+        &--900 {
+            font-weight: 900;
+        }
+    }
+
+    .header {
+        &--1 {
+            font-size: clamp(3rem, 3vw, 5rem);
+        }
+    }
+
+}

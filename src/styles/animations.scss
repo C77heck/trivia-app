@@ -1,0 +1,16 @@
+@mixin Animations() {
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .appear-smoothly {
+        animation: grow 1000ms 1;
+    }
+
+    .spin {
+        display: inline-block;
+        animation: rotate 1200ms linear infinite;
+    }
+}

@@ -1,0 +1,10 @@
+@function map-get-deep($map, $key, $index) {
+    @if not($map == null) {
+        $result: map-get($map, $key);
+        @if not($result == null) {
+            @return map-get($result, $index);
+        }
+    }
+
+    @return "#fffff";
+}
