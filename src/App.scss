@@ -1,11 +1,11 @@
 @import "styles/fonts";
 @import "styles/globals";
-@import "styles/helpers";
+@import "styles/generic-styles";
 @import "styles/functions";
 @import "styles/animations";
 @import "features/shared-ui/buttons/button";
 
-@include Helpers($lg, $xl, $md, $sm, $colours);
+@include GenericStyles($lg, $xl, $md, $sm, $colours);
 @include Fonts();
 @include Animations();
 @include Button($colours);

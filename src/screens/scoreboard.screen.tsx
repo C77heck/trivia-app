@@ -1,8 +1,8 @@
 import { Scoreboard } from '../features/scoreboard/scoreboard';
-import { ScreenProps, ScreenRoute } from './libs/screen.route';
+import { BaseLayout } from '../features/shared-ui/layout/base-layout';
 
-export const ScoreboardScreen = ({ route }: ScreenProps) => {
-    return <ScreenRoute route={route}>
+export const ScoreboardScreen = () => {
+    return <BaseLayout>
         <Scoreboard/>
-    </ScreenRoute>;
+    </BaseLayout>;
 };

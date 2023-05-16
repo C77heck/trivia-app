@@ -1,9 +1,4 @@
 @mixin Animations() {
-    @keyframes rotate {
-        100% {
-            transform: rotate(360deg);
-        }
-    }
     @keyframes grow {
         0% {
             transform: scale(0);
@@ -15,11 +10,5 @@
 
     .appear-smoothly {
         animation: grow 500ms 1 forwards;
-    }
-
-
-    .spin {
-        display: inline-block;
-        animation: rotate 1200ms linear infinite;
     }
 }

@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuestionnaireContext } from '../../contexts/questionnaire.context';
 import { useArchivedQuestionManager } from '../../hooks/archived-question-manager.hook';
-import { useGameManager } from '../../hooks/game-manager.hook';
-import { useQuestionnaireManager } from '../../hooks/questionnaire-manager.hook';
 import { Constants } from '../../libs/constants';
-import { BaseView } from '../../screens/libs/base-view';
+import { BaseView } from '../shared-ui/layout/base-view';
 import { AnswerResult } from './answer-result';
 
 export const Scoreboard = () => {
-    const { getScore } = useGameManager();
-    const { getQuestionnaire, clearQuestionnaire } = useQuestionnaireManager();
+    const { getQuestionnaire, clearQuestionnaire, getScore } = useQuestionnaireContext();
     const { archiveQuestions } = useArchivedQuestionManager();
     const { home, questionnaire } = Constants.routes;
     const navigate = useNavigate();
@@ -19,7 +17,7 @@ export const Scoreboard = () => {
         try {
             setResult(getScore() || null);
         } catch (e) {
-            if (e?.message === 'Incomplete') {
+            if ((e as Error)?.message === 'Incomplete') {
                 navigate(questionnaire.link);
             }
         }

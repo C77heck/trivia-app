@@ -29,11 +29,4 @@
             font-weight: 900;
         }
     }
-
-    .header {
-        &--1 {
-            font-size: clamp(3rem, 3vw, 5rem);
-        }
-    }
-
 }

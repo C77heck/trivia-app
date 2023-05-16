@@ -1,8 +1,8 @@
 import { Questionnaire } from '../features/questionnaire/questionnaire';
-import { ScreenProps, ScreenRoute } from './libs/screen.route';
+import { BaseLayout } from '../features/shared-ui/layout/base-layout';
 
-export const QuestionnaireScreen = ({ route }: ScreenProps) => {
-    return <ScreenRoute route={route}>
+export const QuestionnaireScreen = () => {
+    return <BaseLayout>
         <Questionnaire/>
-    </ScreenRoute>;
+    </BaseLayout>;
 };

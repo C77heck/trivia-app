@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
+import { BaseLayout } from '../features/shared-ui/layout/base-layout';
+import { BaseView } from '../features/shared-ui/layout/base-view';
 import { Constants } from '../libs/constants';
-import { BaseView } from './libs/base-view';
-import { ScreenProps, ScreenRoute } from './libs/screen.route';
 
-export const HomeScreen = ({ route }: ScreenProps) => {
+export const HomeScreen = () => {
     const { questionnaire } = Constants.routes;
 
-    return <ScreenRoute route={route}>
+    return <BaseLayout>
         <BaseView>
             <div className={'col-4 display-flex justify-content-center align-items-start'}>
                 <h2 className={'appear-smoothly fs-24 text-align-center fw--600 max-width-14'}>Welcome to the Trivia Challenge!</h2>
@@ -23,5 +23,5 @@ export const HomeScreen = ({ route }: ScreenProps) => {
                 </NavLink>
             </div>
         </BaseView>
-    </ScreenRoute>;
+    </BaseLayout>;
 };

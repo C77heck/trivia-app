@@ -1,26 +1,46 @@
 import DOMPurify from 'dompurify';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AnswerOption } from '../../hooks/archived-question-manager.hook';
-import { useGameManager } from '../../hooks/game-manager.hook';
+import { useQuestionnaireContext } from '../../contexts/questionnaire.context';
+import { AnswerOption, Question } from '../../hooks/archived-question-manager.hook';
 import { Constants } from '../../libs/constants';
-import { BaseView } from '../../screens/libs/base-view';
 import { Button } from '../shared-ui/buttons/button';
+import { BaseView } from '../shared-ui/layout/base-view';
 import { Spinner } from '../shared-ui/spinner/spinner';
 import { QuestionIllustration } from './question-illustration';
 
 export const Questionnaire = () => {
-    const { currentQuestion, addAnsweredQuestion, setCurrentQuestion } = useGameManager();
+    const { setupNewGame, currentQuestion, questionnaire, saveQuestionnaire, nextQuestion } = useQuestionnaireContext();
     const { scoreboard } = Constants.routes;
     const navigate = useNavigate();
 
+    useEffect(() => {
+        setupNewGame();
+    }, []);
+
     if (!currentQuestion) {
-        return <BaseView className={'justify-content-center'}>
+        return <BaseView className={'display-flex justify-content-center'}>
             <Spinner/>
         </BaseView>;
     }
 
     const { category, question, key } = currentQuestion;
+
     const questionNum = key + 1;
+
+    const addAnsweredQuestion = (answeredQuestion: Question) => {
+        const updatedQuestionnaire = questionnaire.map(question => {
+            if (question.question === answeredQuestion.question) {
+                return answeredQuestion;
+            }
+
+            return question;
+        });
+
+        nextQuestion();
+        saveQuestionnaire(updatedQuestionnaire);
+    };
+
     const handleOnAnswer = async (userAnswer: AnswerOption) => {
         addAnsweredQuestion({
             ...currentQuestion,
@@ -28,7 +48,6 @@ export const Questionnaire = () => {
         });
 
         if (currentQuestion.key === 9) {
-            setCurrentQuestion(null);
             navigate(scoreboard.link);
         }
     };

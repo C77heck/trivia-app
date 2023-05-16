@@ -1,6 +1,6 @@
-@mixin Helpers($lg, $xl, $md, $sm, $colours) {
+@mixin GenericStyles($lg, $xl, $md, $sm, $colours) {
     .screen-view {
-        background-image: url("/src/assets/images/texture.jpg");
+        background-image: url("../../src/assets/images/texture.jpg");
         min-height: 100vh;
         max-width: 100vw;
         min-width: 100vw;

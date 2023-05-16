@@ -1,23 +1,35 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+// import { BrowserRouter as Router } from 'react-router-dom';
 import './App.scss';
 import { WithQuestionnaireContext } from './contexts/questionnaire.context';
-import { Spinner } from './features/shared-ui/spinner/spinner';
 import { Constants } from './libs/constants';
+import { FallbackScreen } from './screens/fallback.screen';
 import { HomeScreen } from './screens/home.screen';
 import { QuestionnaireScreen } from './screens/questionnaire.screen';
 import { ScoreboardScreen } from './screens/scoreboard.screen';
 
-function App() {
-    const { home, questionnaire, scoreboard } = Constants.routes;
+const { home, questionnaire, scoreboard } = Constants.routes;
 
-    return <React.Suspense fallback={<div><Spinner/></div>}>
+const router = createBrowserRouter([
+    {
+        path: home.link,
+        element: <HomeScreen/>
+    },
+    {
+        path: questionnaire.link,
+        element: <QuestionnaireScreen/>
+    },
+    {
+        path: scoreboard.link,
+        element: <ScoreboardScreen/>
+    },
+]);
+
+function App() {
+    return <React.Suspense fallback={<FallbackScreen/>}>
         <WithQuestionnaireContext>
-            <Router>
-                <HomeScreen route={home.link}/>
-                <QuestionnaireScreen route={questionnaire.link}/>
-                <ScoreboardScreen route={scoreboard.link}/>
-            </Router>
+            <RouterProvider router={router}/>
         </WithQuestionnaireContext>
     </React.Suspense>;
 }
