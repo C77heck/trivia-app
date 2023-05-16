@@ -14,6 +14,7 @@ export const AnswerResult = ({ isRight, question, delay }: AnswerResultProps) =>
     const { isAnimated, setRef } = useIntersectionAnimator<Element | null>({ delay });
 
     return <div
+        data-testid={'answer-result'}
         ref={ref => setRef(ref)}
         className={`${isAnimated ? 'appear-smoothly' : 'scale-0'} display-flex py-1 align-items-start`}
     >

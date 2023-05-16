@@ -23,7 +23,7 @@ export const Button = (props: ButtonProps) => {
         disabled={props.disabled}
         onClick={props.onClick}
     >
-        {props.children ? props.children : <span className={'color--light fs-17'}>{props.title}</span>}
+        {props.children ? props.children : <span className={'color-light-1 fs-17'}>{props.title}</span>}
     </button>;
 };
 

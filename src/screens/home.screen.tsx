@@ -8,7 +8,7 @@ export const HomeScreen = () => {
 
     return <BaseLayout>
         <BaseView>
-            <div className={'col-4 display-flex justify-content-center align-items-start'}>
+            <div data-testid={'home-screen'} className={'col-4 display-flex justify-content-center align-items-start'}>
                 <h2 className={'appear-smoothly fs-24 text-align-center fw--600 max-width-14'}>Welcome to the Trivia Challenge!</h2>
             </div>
             <div className={'col-9 center'}>
@@ -18,8 +18,11 @@ export const HomeScreen = () => {
                 <h4 className={'appear-smoothly fs-24 text-align-center fw--400'}>Can you score 100%</h4>
             </div>
             <div className={'col-3 center'}>
-                <NavLink className={'appear-smoothly text-decoration-none hover-opacity'} to={questionnaire.link}>
-                    <span className={'fs-24 text-align-center uppercase'}>Begin</span>
+                <NavLink
+                    className={'appear-smoothly text-decoration-none hover-opacity fs-24 text-align-center uppercase'}
+                    to={questionnaire.link}
+                >
+                    Begin
                 </NavLink>
             </div>
         </BaseView>

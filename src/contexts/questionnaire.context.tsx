@@ -1,8 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { Children } from '../features/shared-ui/layout/base-view';
 import { ApiResponse, Question, useArchivedQuestionManager } from '../hooks/archived-question-manager.hook';
 import { HttpError } from '../libs/http-error';
-import { Storage } from '../libs/storage';
 
 export interface IQuestionnaireContext {
     isLoading: boolean;
@@ -13,7 +12,6 @@ export interface IQuestionnaireContext {
     setupNewGame: () => void;
     getScore: () => ScoreResponse;
     saveQuestionnaire: (questionnaire: Question[]) => void;
-    getQuestionnaire: () => Question[];
 }
 
 export interface ScoreResponse {
@@ -37,9 +35,6 @@ const QuestionnaireContext = createContext<IQuestionnaireContext>({
     },
     saveQuestionnaire: (_questionnaire: Question[]) => {
     },
-    getQuestionnaire: (): Question[] => {
-        return [];
-    },
 });
 
 export const WithQuestionnaireContext = ({ children }: { children: Children }) => {
@@ -47,23 +42,14 @@ export const WithQuestionnaireContext = ({ children }: { children: Children }) =
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const endpoint = process.env.REACT_APP_API_ENDPOINT;
-    const storage = new Storage<Question[]>('current-questionnaire');
     const { getArchivedQuestions } = useArchivedQuestionManager();
-
-    useEffect(() => {
-        console.log('CALLED CONTEXT');
-
-        (async () => setupNewGame)();
-    }, []);
 
     const setupNewGame = async () => {
         try {
-            console.log('are we triggering it?');
             setIsLoading(true);
-            const savedQuestions = storage.get();
-            const questions = !savedQuestions?.length ? await getNewQuestionnaire() : savedQuestions;
+            const questions = await getNewQuestionnaire();
             setQuestionnaire(questions);
-            setCurrentQuestion(questions[0]);
+            setCurrentQuestion(questions?.[0]);
         } catch (e) {
             console.log(e);
         } finally {
@@ -77,14 +63,9 @@ export const WithQuestionnaireContext = ({ children }: { children: Children }) =
         const questions: string[] = [];
 
         for (const question of newQuestions) {
-            const existingQuestion = pastQuestions.find(pastQuestion => pastQuestion === question.question);
-            if (existingQuestion) {
-                continue;
-            }
-
-            if (!questions.includes(question.question)) {
+            if (!questions.includes(question?.question) && !pastQuestions.includes(question.question)) {
                 questionsToSave.push(question);
-                questions.push(question.question);
+                questions.push(question?.question);
             }
 
             if (questionsToSave.length === 10) {
@@ -137,11 +118,13 @@ export const WithQuestionnaireContext = ({ children }: { children: Children }) =
                         ? getQuestions(questionsToSave, 0, 'easy')
                         : getQuestions(questionsToSave, tries + 1, difficulty);
                 case 'easy':
-                    return tries > 13
-                        ? questionsToSave
-                        : getQuestions(questionsToSave, tries + 1, difficulty);
+                    if (tries < 13) {
+                        return getQuestions(questionsToSave, tries + 1, difficulty);
+                    }
+
+                    throw new Error('Insufficient questions');
                 default:
-                    return questionsToSave;
+                    throw new Error('difficulty must be set');
             }
         } catch (e) {
             throw e;
@@ -157,34 +140,33 @@ export const WithQuestionnaireContext = ({ children }: { children: Children }) =
     };
 
     const clearQuestionnaire = (): void => {
-        storage.clear();
+        setQuestionnaire([]);
+        setCurrentQuestion(null);
     };
 
-    const saveQuestionnaire = (questionnaire: Question[]): void => {
-        setQuestionnaire(questionnaire);
-        storage.set(questionnaire);
-    };
-
-    const getQuestionnaire = (): Question[] => {
-        return !questionnaire?.length ? storage.get() : questionnaire;
+    const saveQuestionnaire = (questionnaireToSave: Question[]): void => {
+        setQuestionnaire(questionnaireToSave);
     };
 
     const getScore = (): ScoreResponse => {
         const rightAnswers: string[] = [];
         const wrongAnswers: string[] = [];
-        const completedQuestionnaire = getQuestionnaire();
 
-        for (const answeredQuestion of completedQuestionnaire) {
+        if (!questionnaire?.length) {
+            throw new Error('Incomplete');
+        }
+
+        for (const answeredQuestion of questionnaire) {
             if (!('userAnswer' in answeredQuestion)) {
                 throw new Error('Incomplete');
             }
 
             if (answeredQuestion.correct_answer.includes(answeredQuestion?.userAnswer || '')) {
-                rightAnswers.push(answeredQuestion.question);
+                rightAnswers.push(answeredQuestion?.question);
                 continue;
             }
 
-            wrongAnswers.push(answeredQuestion.question);
+            wrongAnswers.push(answeredQuestion?.question);
         }
 
         return {
@@ -201,7 +183,6 @@ export const WithQuestionnaireContext = ({ children }: { children: Children }) =
         nextQuestion,
         clearQuestionnaire,
         saveQuestionnaire,
-        getQuestionnaire,
         setupNewGame,
         getScore
     }}>

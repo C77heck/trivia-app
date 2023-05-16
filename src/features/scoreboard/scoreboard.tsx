@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useQuestionnaireContext } from '../../contexts/questionnaire.context';
 import { useArchivedQuestionManager } from '../../hooks/archived-question-manager.hook';
 import { Constants } from '../../libs/constants';
+import { Button } from '../shared-ui/buttons/button';
 import { BaseView } from '../shared-ui/layout/base-view';
 import { AnswerResult } from './answer-result';
 
 export const Scoreboard = () => {
-    const { getQuestionnaire, clearQuestionnaire, getScore } = useQuestionnaireContext();
+    const { questionnaire, clearQuestionnaire, getScore } = useQuestionnaireContext();
     const { archiveQuestions } = useArchivedQuestionManager();
-    const { home, questionnaire } = Constants.routes;
+    const routes = Constants.routes;
     const navigate = useNavigate();
     const [result, setResult] = useState<any>(null);
 
@@ -18,7 +19,7 @@ export const Scoreboard = () => {
             setResult(getScore() || null);
         } catch (e) {
             if ((e as Error)?.message === 'Incomplete') {
-                navigate(questionnaire.link);
+                navigate(routes.questionnaire.link);
             }
         }
     }, []);
@@ -28,26 +29,25 @@ export const Scoreboard = () => {
     }
 
     const handleOnClick = () => {
-        const questionnaireToArchive = getQuestionnaire();
-        archiveQuestions(questionnaireToArchive);
+        archiveQuestions(questionnaire);
         clearQuestionnaire();
-        navigate(home.link);
+        navigate(routes.home.link);
     };
 
     return <BaseView>
-        <div className={'col-3 display-flex flex-column'}>
+        <div data-testid={'scoreboard'} className={'col-3 display-flex flex-column'}>
             <h2 className={'fs-24 text-align-center fw--600 appear-smoothly'}>You scored</h2>
             <h2 className={'fs-24 text-align-center fw--600 appear-smoothly'}>{result.score} / 10</h2>
         </div>
         <div className={'col-19'}>
             <div className={'row flex-column scroll-view flex-nowrap'}>
-                {result.rightAnswers.map((question, index) => <AnswerResult
+                {result?.rightAnswers?.map((question, index) => <AnswerResult
                     delay={(index + 1) * 100}
                     key={question}
                     isRight={true}
                     question={question}
                 />)}
-                {result.wrongAnswers.map((question, index) => <AnswerResult
+                {result?.wrongAnswers?.map((question, index) => <AnswerResult
                     delay={((result.rightAnswers.length + index) + 1) * 100}
                     key={question}
                     isRight={false}
@@ -56,10 +56,12 @@ export const Scoreboard = () => {
             </div>
         </div>
         <div className={'col-2 display-flex center'}>
-            <span
+            <Button
+                buttonStyle={'link'}
                 onClick={handleOnClick}
-                className={'appear-smoothly fs-24 text-align-center uppercase hover-opacity'}
-            >Play again?</span>
+            >
+                <span className={'appear-smoothly fs-24 text-align-center uppercase hover-opacity'}>Play again?</span>
+            </Button>
         </div>
     </BaseView>;
 };

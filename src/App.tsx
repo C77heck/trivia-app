@@ -1,6 +1,5 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider, } from "react-router-dom";
-// import { BrowserRouter as Router } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.scss';
 import { WithQuestionnaireContext } from './contexts/questionnaire.context';
 import { Constants } from './libs/constants';
